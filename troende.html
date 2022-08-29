@@ -38,8 +38,8 @@
       <h1>Alle</h1>
     </header>
     <nav>
-      <button data-troende="alle">Alle</button>
-      <button data-troende="ja" class="valgt">Troende</button>
+      <button data-troende="alle" class="valgt">Alle</button>
+      <button data-troende="ja">Troende</button>
       <button data-troende="nej">Ikke troende</button>
       <button data-troende="tvivler">Tvivler</button>
     </nav>
@@ -54,6 +54,7 @@
       </article>
     </template>
     <script>
+      const header = document.querySelector("header h1");
       const endpoint = "https://persongalleri-5d3e.restdb.io/rest/persongalleri";
       const mereinfo = {
         headers: {
@@ -63,9 +64,19 @@
       let personer;
 
       document.addEventListener("DOMContentLoaded", start);
-      let filter = "nej";
+      let filter = "alle";
       function start() {
+        const filterKnapper = document.querySelectorAll("nav button");
+        filterKnapper.forEach((knap) => knap.addEventListener("click", filtrerPersoner));
         hentData();
+      }
+
+      function filtrerPersoner() {
+        filter = this.dataset.troende;
+        document.querySelector(".valgt").classList.remove("valgt");
+        this.classList.add("valgt");
+        visPersoner();
+        header.textContent = this.textContent;
       }
 
       async function hentData() {
@@ -78,9 +89,11 @@
       function visPersoner() {
         const holder = document.querySelector("#holder");
         const skabelon = document.querySelector("template").content;
+        holder.textContent = "";
         personer.forEach((person) => {
-          if (filter == person.troende) {
+          if (filter == person.troende || filter == "alle") {
             const klon = skabelon.cloneNode(true);
+
             klon.querySelector(".fornavn").textContent = person.fornavn;
             klon.querySelector(".fødselsdag").textContent = person.fødselsdag.slice(0, 10);
             klon.querySelector(".email").textContent = person.email;
